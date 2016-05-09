@@ -1,0 +1,113 @@
+I File che hanno sia il suffisso h che cpp sono oggetti, i .root sono 
+file di Root, i dati delle varie miscele sono nei .DAT e all'interno 
+della cartella DATA. Il File compile.C contiene i comandi per compilare
+tutte le parti della simulazione.
+
+Simulazione:
+
+Per vedere come vengono chiamate le varie parti della simulazione ti 
+conviene guardare la funzione EventsTree() in Validation.cpp:
+Per prima cosa viene calcolato il punto di conversione, chiamando un'apposita 
+funzione che e' in questo stesso programma;
+Vengono creati una serie di oggetti:
+una TSource, contiene le informazioni sulla direzione di uscita del 
+fotoelettrone, in funzione del grado di polarizzazione e dell'angolo di 
+polarizzazione;
+un TPhoton, che contiene il TSource, da cui prende le distribuzioni dei 
+fotoelettroni, e aggiunge le funzioni per gli Auger
+Un TTrack, che e' il nucleo del montecarlo; segue lo schema di Joy ed ha una 
+serie di funzioni per fornire informazioni fisiche sulle tracce e fare alcuni
+plot.Nel costruttore di TTrack occorre una TGasMixture, l'oggetto che 
+simula la miscela e che contiene tutte le informazioni relative; queste
+informazioni sono contenute nei vari File DAT, lette da TGasMixture, TCompound 
+e TElement. In TTrack c'e' già' l'informazione sulle dimensioni della cella
+in modo da fermare il processo se si finisce "fuori dal gas", questi dati 
+scaturiscono da un file di testo che si chiama Dimension.txt (W la fantasia)
+dove sono riportati spessore,raggio, passo GEM, passo Pixel, guadagno efficace
+ della GEM e numero di elettroni necessari per un conteggio; il File viene letto
+dall'oggetto TDimension che puo' anche scrivere il file (in modo da sapere quale
+era il settaggio di dati che eventualmente puoi salvare); chiamata la funzione
+Track.PropagatePhotoelectron(), la generazione e' completata,
+Track.Drift() fa diffondere i primari (distribuzione gaussiana ricavata dal valore
+a 1atm e 1 Cm riportato in MIXTURE.DAT)
+DifEl  =  Track.GetDiffElectronPosition() riempie un array  con le posizioni
+di arrivo sulla GEM dei primari.
+A questo punto si usano la TGem e il TDetector gia' create all'interno di questa
+funzione:
+Gem.DiffusionofSecondaryElectrons(DifEl) fa due cose, mette l'elettrone nel foro
+della Gem piu' vicino alla sua posizione di arrivo,genera un punto random sulla 
+circonferenza interna del foro della Gem (GemSampling) e da li fa scaturire la 
+cascata (DiffusionofSecondaryElectrons), il fatto che la cascata si generi ai 
+bordi del foro risulta da alcune simulazioni fatte con Maxwell.
+myDetector.mySampling prende le posizioni degli elettroni dopo l'amplificazione
+e crea un vettore che contiene i pixel colpiti, il numero di elettroni raccolti
+dal pixel e il segnale in conteggi.Questa funzione di TDetector usa TReadout che
+trasforma un piano bidimensionale x, y in un piano di esagoni a matrice 
+triangolare: dati x,y individua l'esagono (con coordinate i j), il centro 
+dell'esagono, il numero del canale.
+
+Analisi
+
+l'analisi della singola traccia e' contenuta in TCluster.
+Validation2 contiene le funzioni che analizzano un intero tree di dati 
+An("Nome del tree") o ti fanno visualizzare una traccia (Clusterview).
+L'oggetto TTreeAnalysis e' quello che apre, legge ed analizza il tree, usando 
+TCluster, e creando un Tree friend (e' spiegato nel manuale di ROOT, che trovi 
+su internet http://root.cern.ch/) che permette di visualizzare contemporaneamente
+i dati dai due diversi Tree. 
+
+
+I settaggi del grado e dell'angolo di polarizzazione, energia del fotone, miscela
+sono tutti all'inizio di Validation.cpp (per cambiare le proporzioni delle
+ miscele devi cambiare il File MIXTURE.DAT, MixID e' il numero della riga,
+ cioe'0 e' Ne Dme 80 - 20 ad 1 atm), per modificare le dimensioni della cella, dei
+ Pixel e della Gem devi cambiare il File Dimension.txt.
+
+L'oggetto TMDP serve per fare alcuni calcoli con i flussi della Crab e di Hercules
+X-1, e l'area efficace di uno specchio X.
+
+TVarPolFlux ignoralo, e' un tentativo di generare polarizzazioni variabili secondo
+un modello di stella di neutroni preso da alcuni articoli.
+
+Esempio di Run:
+Lanci Root, comando .x compile.C, compili tutte le macro della simulazione,
+comando EventsTree(), crei un tree con le grandezze di default:
+i parametri sono, un numero intero = numero di tracce montecarlo della simulazione; un double, energia dei fotoni incidenti; un TString, una stringa di testo con 
+il nome del file in cui vuoi salvare il tree (l'estenzione .root, viene messa in 
+automatico).
+Con il comando TBrowser a, si apre un'altra finestra, nella cartella in cui hai 
+il programma c'e' un file .root, quello che hai appena creato, se non gli hai dato
+un nome, si chiama Eventstree.root, clicca due volte, clicca su ROOT files 
+nella finestra a sinistra, a destra adesso hai Eventstree.root,clicca su 
+Eventstree.root a sinistra, e poi con il tasto destro su EventsTree, seleziona
+startviewer, da qui poi fare istogrammi di tutte le variabili del tree, trascinando la variabile nelle caselle X, Y o Z e cliccando sull'icona in basso a sinistra
+(accanto a STOP).(l'angolo di emissione longitudunale e' InitialPhi, se hai 
+lanciato una simulazione con grado di polarizzazione alto vedrai un Cos^2).
+Per l'analisi, chiudi Root (comando .q),riapri, compili e dai il comando 
+An(nome file tra virgolette), esempio An("Eventstree"), compare questo:
+
+ Reading parameters from file: Dimensions.txt     <-di base TDimension legge questofile
+ Reading parameters from file: Eventstree.txt     <- l'analisi richiede che ci sia un file di testo che si chiama come il tree, viene fatto e sovrascritto ogn volta che fai un nuovo tree
+ 
+Retrieving mixture informations...   <-ti dice le caratteristiche della miscela
+Number of compounds in the mixture: 2
+Compound name: Ne, fraction: 0.5
+Compound name: DME, fraction: 0.5
+Gap Thickness = 1
+Mixture pressure: 1
+Diffusion sigma (from the value @ 1atm): 85 um (for 1 cm drift)
+W ionization: 25 eV
+ 
+Retrieving informations about Ne...
+ 
+Retrieving informations about DME...
+ 
+Density of the mixture: 0.00147782 g/cm^3
+Number of elements in the mixture: 0x410eac244
+Element: Ne, partial density: 0.000450143 g/cm^3
+Element: C, partial density: 0.00053587 g/cm^3
+Element: H, partial density: 0.000134902 g/cm^3
+Element: O, partial density: 0.000356906 g/cm^3
+
+
+seguono alcune medie su tutti i cluster e i risultati dei Fit

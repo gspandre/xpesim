@@ -1,0 +1,45 @@
+Name1		P1	Name2		P2	Name3	P3  Sigma@1atm
+Ne		0.8	DME		0.2	-	0	132
+Ne              0.5     DME             0.5     -       0       85      
+Ne              0.4     DME             0.6     -       0       77      
+He		0.4	DME		0.6	-	0	77	     	
+He		0.5	DME		0.5	-	0	84
+He		0.2	DME		0.8	-	0	68
+H               0.2     DME             0.8     -       0       67 
+H               0.3     DME             0.7     -       0       67 
+H               0.4     DME             0.6     -       0       67 
+DME		1	-		0	-	0  	60	     
+CO2		1	-		0	-	0       72	     
+CF4		0.2	DME		0.8	-	0	58.6	 
+Ar              0.4     DME             0.6     -       0       79         
+Ar              0.6     DME             0.4     -       0       85         
+Acetylene	1	-		0	-	0       83	     
+Isobutane	1	-		0.0	-	0.0	115	     
+CS2		0.5	He		0.5	-	0       20	     
+Ar		1	-		0	-	0       10	     
+Ar              0.4     DME             0.6     -       0       79         
+Kr              0.6     DME             0.4     -       0       100        
+Kr              0.8     DME             0.2     -       0       140        
+Kr              0.4     Ar              0.4     DME     0.2     120        
+H               1       -               0       -       0       30           
+Ne 		1	-		0	-	0	150
+CF4		0.5	DME		0.5	-	0	59.8
+CF4		0.8	Isobutane	0.2	-	0	72.26	 
+Ne              0.4     DME             0.6     -       0       5      
+Ar              0.5     DME             0.5     -       0       86     
+H               0.4     DME             0.6     -       0       75.4    
+Kr              1       -               0       -       0       150
+Xe              1       -               0       -       0       150
+
+----------------------------------------------------------------------------------------------------
+Propane		1	-		0	-	0	0.25	  136	     
+Acetylene	1	-		0	-	0	1	  83	     
+Ethane		1	-		0	-	0	134	     
+Propane		1	-		0	-	0	1	  136	     
+Isobutane	1	-		0	-	0	1	  115	     
+Neopentane	1	-		0	-	0	1	  108	     
+Ethane		0.8	He		0.2	-	0	1	  1	     
+CO2		0.2	Isobutane	0.8	-	0	1	  00	     
+CO2		1	-		0	-	0	1	  00	     
+Acetylene	0.8	DME		0.2	-	0	1	  00	     
+Methane		1	-		-	-	-	1	  226	     

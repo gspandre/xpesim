@@ -1,0 +1,66 @@
+
+ROOTCFLAGS    = $(shell root-config --cflags)
+ROOTLIBS      = $(shell root-config --libs)
+ROOTGLIBS     = $(shell root-config --glibs)
+
+# Linux with egcs
+CXX           = g++
+CXXFLAGS      = -O -Wall -fPIC 
+LD            = g++
+LDFLAGS       = -g
+SOFLAGS       = -shared
+
+
+CXXFLAGS     += $(ROOTCFLAGS)
+LIBS          = $(ROOTLIBS)
+GLIBS         = $(ROOTGLIBS)
+
+ObjSuf        = o
+SrcSuf        = cxx
+SrcSuf1       = cxx
+DllSuf        = so
+ExeSuf        =
+OutPutOpt     = -o 
+
+#------------------------------------------------------------------------------
+
+
+MYFRAMEO    = MC.$(ObjSuf) MyMainFrame.$(ObjSuf) MyMainDict.$(ObjSuf) TXYZ.$(ObjSuf)  TElement.$(ObjSuf) TCompound.$(ObjSuf) TDimension.$(ObjSuf) TGasMixture.$(ObjSuf) TSource.$(ObjSuf) TPhoton.$(ObjSuf) TTrack.$(ObjSuf) THexagon2d.$(ObjSuf) THexagon3d.$(ObjSuf) TGem.$(ObjSuf) TReadout.$(ObjSuf) TCluster.$(ObjSuf) TMDP.$(ObjSuf) TDetector.$(ObjSuf) TTreeAnalysis.$(ObjSuf) TExperiment.$(ObjSuf) TEditor.$(ObjSuf) #TRandomGenerator.$(ObjSuf)
+
+MYFRAMES    = MyMainFrame.$(SrcSuf)  TXYZ.$(SrcSuf) TElement.$(SrcSuf) TCompound.$(SrcSuf) TDimension.$(SrcSuf) TGasMixture.$(SrcSuf) TSource.$(SrcSuf) TPhoton.$(SrcSuf) TTrack.$(SrcSuf) THexagon2d.$(SrcSuf) THexagon3d.$(SrcSuf) TGem.$(SrcSuf) TReadout.$(SrcSuf) TCluster.$(SrcSuf) TMDP.$(SrcSuf) TDetector.$(SrcSuf) TTreeAnalysis.$(SrcSuf) TExperiment.$(SrcSuf) TEditor.$(SrcSuf) MyMainDict.$(SrcSuf) # TRandomGenerator.$(SrcSuf)
+MYFRAMESO   = libMyMainFrame.$(DllSuf)
+MYFRAMELIB  = $(shell pwd)/$(MYFRAMESO)
+MYFRAME     = MCFrame
+
+OBJS	    = $(MYFRAMEO)
+PROGRAMS    = $(MYFRAME)
+CINT_HDRS   = MC.h MyMainFrame.h 
+HDRS   = MC.h MyMainFrame.h TXYZ.h TRandomGenerator.h TElement.h TCompound.h TDimension.h TGasMixture.h  TSource.h TPhoton.h TTrack.h THexagon2d.h THexagon3d.h TGem.h TReadout.h TCluster.h TMDP.h  TDetector.h TTreeAnalysis.h TExperiment.h FastSimulator.h TPixMap.h TEditor.h
+
+.SUFFIXES: .$(SrcSuf) .$(ObjSuf) .$(DllSuf) .$(SrcSuf)
+
+
+$(MYFRAMESO):	$(MYFRAMEO)
+		$(LD) $(SOFLAGS) $(LDFLAGS) $^ $(OutPutOpt) $@ $(LIBS) $(GLIBS)
+		@echo "$@ done 1"
+
+$(MYFRAME):	$(OBJS)
+		$(LD) $(LDFLAGS) $(MYFRAMELIB) $(LIBS) $(OutPutOpt) $@
+		@echo "$@ done 2"
+
+clean:
+	@rm -f $(OBJS) *Dict.* core* lib*.so
+
+
+.SUFFIXES: .$(SrcSuf)
+
+
+MyMainFrame.$(ObjSuf): $(HDRS)
+MyMainDict.$(SrcSuf):	$(CINT_HDRS) MyMainLinkDef.h
+		@echo "Generating dictionary $@..."
+		$(ROOTSYS)/bin/rootcint -f $@ -c $^
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
+
+

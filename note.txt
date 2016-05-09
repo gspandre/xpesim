@@ -1,0 +1,37 @@
+G. Spandre - INFN Pisa (gloria.spandre@pi.infn.it)
+
+TO COMPILE:
+
+on Windows
+1. make -f MakefileWin
+2. make -f MakefileWin MCFrame.exe
+
+on Linux
+1. make -f MakefileLinux
+2. make -f MakefileLinux MCFrame
+
+-------------------------------------------------
+
+Stopping power (dE/dx in eV/cm) and total ionization are read in file
+COMPOUNDS.DAT
+
+Dimensioni della sorgente definite in TSource.cxx:
+
+-  gaussiana: 
+      double X=rnd->Gaus(0.,0.05);
+      double Y=rnd->Gaus(0.,0.05);
+	
+ - uniforme
+      double X=rnd->Uniform(-0.007,0.007);
+      double Y=rnd->Uniform(-0.007,0.007);
+
+
+TODO:
+
+1. salvare configurazione in file info.dat
+2. inserire popup per caricare mirror
+3. inserire analisi tipo pixi, automatica
+4. calcolo modulazione vs energia (+plot)
+5. calcolo MDP vs energia (+plot)
+6. calcolo Fattore di merito vs energia (+plot)
+

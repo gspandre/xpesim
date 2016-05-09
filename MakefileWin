@@ -1,0 +1,45 @@
+include Makefile.arch
+#------------------------------------------------------------------------------
+
+MYFRAMEOBJS    = MC.$(ObjSuf) MyMainFrame.$(ObjSuf)  TXYZ.$(ObjSuf) TRandomGenerator.$(ObjSuf) TElement.$(ObjSuf) TCompound.$(ObjSuf) TDimension.$(ObjSuf) TGasMixture.$(ObjSuf) TSource.$(ObjSuf) TPhoton.$(ObjSuf) TTrack.$(ObjSuf) THexagon2d.$(ObjSuf) THexagon3d.$(ObjSuf) TGem.$(ObjSuf) TReadout.$(ObjSuf) TCluster.$(ObjSuf) TMDP.$(ObjSuf) TDetector.$(ObjSuf) TTreeAnalysis.$(ObjSuf) TExperiment.$(ObjSuf) TEditor.$(ObjSuf) MyMainDict.$(ObjSuf)
+
+MYFRAMES    = MyMainFrame.$(SrcSuf)  TXYZ.$(SrcSuf) TRandomGenerator.$(SrcSuf) TElement.$(SrcSuf) TCompound.$(SrcSuf) TDimension.$(SrcSuf) TGasMixture.$(SrcSuf) TSource.$(SrcSuf) TPhoton.$(SrcSuf) TTrack.$(SrcSuf) THexagon2d.$(SrcSuf) THexagon3d.$(SrcSuf) TGem.$(SrcSuf) TReadout.$(SrcSuf) TCluster.$(SrcSuf) TMDP.$(SrcSuf) TDetector.$(SrcSuf) TTreeAnalysis.$(SrcSuf) TExperiment.$(SrcSuf) TEditor.$(SrcSuf) MyMainDict.$(SrcSuf) 
+
+MYFRAMESO   = libMyMainFrame.$(DllSuf)
+MYFRAME     = MCFrame$(ExeSuf)
+MYFRAMELIB  = libMyMainFrame.lib
+
+PROGRAMS    = $(MYFRAME)
+CINT_HDRS   = MC.h MyMainFrame.h 
+HDRS   = MC.h MyMainFrame.h TXYZ.h TRandomGenerator.h TElement.h TCompound.h TDimension.h TGasMixture.h  TSource.h TPhoton.h TTrack.h THexagon2d.h THexagon3d.h TGem.h TReadout.h TCluster.h TMDP.h  TDetector.h TTreeAnalysis.h TExperiment.h FastSimulator.h TPixMap.h TEditor.h
+
+.SUFFIXES: .$(SrcSuf) .$(ObjSuf) 
+
+
+$(MYFRAMESO):	$(MYFRAMEOBJS)
+		BINDEXPLIB  $* $(MYFRAMEOBJS) > $*.def
+		lib -nologo -MACHINE:IX86 $(MYFRAMEOBJS) -def:$*.def $(OutPutOpt)$(MYFRAMELIB)
+		$(LD) $(SOFLAGS) $(LDFLAGS) $(MYFRAMEOBJS) $(*.exp) $(GLIBS) $(OutPutOpt)$(MYFRAMESO)
+		$(MT_DLL)
+		@echo "$(MYFRAMESO) done"
+	
+$(MYFRAME):	$(MYFRAMESOBJS)
+		$(LD)  $(LDFLAGS) $(MYFRAMEOBJS) $(MYFRAMELIB) $(GLIBS) $(OutPutOpt)$(MYFRAME)
+		$(MT_EXE)
+		@echo "$(MYFRAME) done"
+
+clean:
+	@rm -f *.obj *Dict.* *.exe *.lib *.exp 
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
+
+
+MyMainFrame.$(ObjSuf): $(HDRS)
+MyMainDict.$(SrcSuf):	$(CINT_HDRS) MyMainLinkDef.h
+		@echo "Generating dictionary $@..."
+		rootcint -f $@ -c $^
+
+

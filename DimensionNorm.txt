@@ -1,0 +1,2 @@
+Thickness Gem_Radius Gem_Pitch Pitch Gain ElectronADC
+1.0	  2.0	     50.       50.0  490  60  1.
