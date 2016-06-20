@@ -2,7 +2,7 @@
 #define TELEMENT_HH
 
 #include "MC.h"
-#define MOLAR_VOLUME          22414.0
+#define MOLAR_VOLUME          24465.4 // @ 25C see issue 2
 #define AVOGADRO_NUMBER       6.02E23
 #define N_ENERGY_BINS         75
 #define ELEMENTS_FILE_NAME    "./ELEMENTS.DAT"
