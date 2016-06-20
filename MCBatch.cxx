@@ -4,10 +4,10 @@
 
 
 #include "MC.h"
-#include "TElement.h"
+#include "TExperiment.h"
 
-//TRandom3 *rnd;
-//TElement *myElement;
+TRandom3 *rnd;
+TExperiment *Experiment;
 
 int main(int argn, char *argv[])
 {
@@ -103,8 +103,17 @@ int main(int argn, char *argv[])
   std::cout<< "Starting MC in batch mode" << std::endl;
 
   
-  //rnd = new TRandom3();
-  //myElement = new TElement("H", rnd, 0);
+  rnd = new TRandom3();
+  Experiment = new TExperiment(rnd);
+  Experiment->SetMixID(gas_id);
+  Experiment->SetPressure(pressure);
+  Experiment->SetThickness(thickness);
+  Experiment->Generalsetup();
+  // source TBD, now is 'monochromatic' by default
+  // Using only Energy Min as energy. scan tbd!!!
+  Experiment->SetSource(pol_angle,pol_degree, energy_min);
+  Experiment->EventsTree(num_evts);
+  
   std::cout<< "End of run!" << std::endl;
   return 0;
 }

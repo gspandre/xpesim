@@ -17,7 +17,8 @@ GLIBS         = $(ROOTGLIBS)
 
 #-----------------------------------------------------------------------------------------------
 
-OBJS = MCBatch.o TElement.o
+OBJS = MCBatch.o TExperiment.o TGasMixture.o TElement.o  TCompound.o TPhoton.o TTrack.o TSource.o TXYZ.o TDetector.o TReadout.o TDimension.o TGem.o THexagon3d.o TCluster.o TTreeAnalysis.o THexagon2d.o
+
 PROGRAMS =  MCBatch
 
 MCBatch:	$(OBJS)

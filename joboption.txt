@@ -13,9 +13,9 @@ pressure: 1.
 thickness: 1
 
 #
-num_evts: 2
+num_evts: 100
 
-energy_min: 1.9
+energy_min: 5.2
 energy_max: 5.9
 
 # polarization angle and degree
