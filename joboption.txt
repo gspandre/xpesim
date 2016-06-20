@@ -1,0 +1,25 @@
+# example of config file for MC
+# parsing is quite trivial so here some rules:
+# comments starts with #
+# do not leave space between keyword and separator ':'
+
+# gas mix id, 12 is He_0.2-DME_0.8 
+gas_id:12
+
+# gas pressure (atm)
+pressure: 1.
+
+# cell thickness (cm)
+thickness: 1
+
+#
+num_evts: 2
+
+energy_min: 1.9
+energy_max: 5.9
+
+# polarization angle and degree
+pol_angle: 30.
+pol_degree: 1.
+
+# source + window non selectable for now
