@@ -9,7 +9,7 @@ class TGem{
  public:
   
   TGem(TRandom *RNG,TDimension *Dimension);
-  std::pair<double,double>                   Sampling(double x, double y);
+  //  std::pair<double,double>                   Sampling(double x, double y);
   std::pair<double,double>                   GemSampling(double xin, double yin);
   inline void SetGain(double gain)  {Gain  = gain;}
   inline void SetPitch(double pitch){Pitch = pitch;}

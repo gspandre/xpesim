@@ -17,7 +17,7 @@ int TGem::GetSecondaryElectrons()
 {
   return (int) (rng->Exp(Gain));
 }
-
+/*
 std::pair<double,double> TGem::Sampling(double x, double y)
 {  
   float  px  = Pitch;
@@ -65,6 +65,9 @@ std::pair<double,double> TGem::Sampling(double x, double y)
   
   return XY;
 } 
+*/
+
+
 /*creazione elettroni secondari con distribuzione gaussiana campionati espressi
   in cm (posizione xy)*/
 
