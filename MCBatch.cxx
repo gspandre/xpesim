@@ -104,6 +104,7 @@ int main(int argn, char *argv[])
 
   
   rnd = new TRandom3();
+  rnd->SetSeed(); // different, uncontrolled seed at each run!
   Experiment = new TExperiment(rnd);
   Experiment->SetMixID(gas_id);
   Experiment->SetPressure(pressure);
