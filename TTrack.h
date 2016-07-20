@@ -43,6 +43,7 @@ class TTrack{
   inline int                   GetAugerCheck() {return  AugerCheck;}
   int nphe;
   int naug;
+  inline Int_t                 GetNPrimaryElectrons(){return nPrimaryElectrons;}
 
  private:
   
