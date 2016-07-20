@@ -48,8 +48,21 @@ std::pair<int,int>  TReadout::Position2Xpol(double Xa, double Ya)
   OffsetCoord o = location_to_offset(Xxpol, Yxpol, Size);
   //cout << "OffsetCoord for ("<<Xxpol <<","<< Yxpol<<") col " <<
   //  o.col<<" row " << o.row << endl; 
-  std::pair<int,int> a = make_pair(o.col,o.row);
-  return a;
+
+  if (o.col>=IMin-1 && o.col<IMax-1 &&
+      o.row>=JMin-1 && o.row<JMax-1 )
+    { 
+      //std::pair<int,int> a = make_pair((int) I,(int)J);
+      std::pair<int,int> a = make_pair(o.col,o.row);
+      return a;
+    }
+  else 
+    {
+      std::cout <<"ATTENZIONE coordinate fuori dal detector!!!  "<< 
+	" X= "<< Xa << " Y= "<< Ya <<" I ="<<o.col<<" J = "<<o.row<<std::endl;
+      std::pair<int,int> a = make_pair(-9999,-9999); //A non-existing pixel
+      return  a;
+    }
 
 }
 
