@@ -6,6 +6,7 @@
 #include "THexagon3d.h"
 #include "THexagon2d.h"
 
+
 class TReadout 
 { 
  public:
@@ -18,7 +19,8 @@ class TReadout
     void                Setdimension(int xmin , int xmax, int ymin, int ymax);
     
     std::pair<int,int>  PositiontoMatrix(double Xa, double Ya);
-    
+    std::pair<int,int>  Position2Xpol(double Xa, double Ya);
+
     void                CenterHexagontoXY (std::pair<int,int> ij ); 
     
     std::pair<double,double>  GetCenterHexagontoXY(); 
@@ -46,9 +48,10 @@ class TReadout
     TCanvas *PixMapCanvas;
     TDimension *Dimension;
     int         IMin,IMax,JMin,JMax;
-    double      Pitch;
+    double      Pitch, Size, Pitch_r;
     double      L,X,Y,PassoX,PassoY;
     double      Xx,I,J;
+    double      Xxpol, Yxpol;
     int         j;
     double      YHexagonCenter,XHexagonCenter;
     int         Cluster,Channel,Iint,Jint,GChannel;

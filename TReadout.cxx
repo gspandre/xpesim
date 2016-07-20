@@ -1,14 +1,22 @@
 #include "TReadout.h"
+#include "THexconvert.h"
 
 TReadout::TReadout(TDimension *Dimension)
 {  
   std::pair<int,int>  Pi=Dimension->GetPixel();
   Setdimension(1, Pi.first,1, Pi.second);
   SetPitch(Dimension->GetPitch());
+
+  // test:
+  // c= 52650 x= -0.00757525 y= -0.00546125 I= 150 J= 175
+  //Position2Xpol(-0.00757525, -0.00546125);
+  //Position2Xpol(0, 0);
 }
 void TReadout::SetPitch(double p)
 {
   Pitch=p;
+  Size    = Pitch/1.732;   //um
+  Pitch_r = Pitch*1.732/2; //um
 }
 double TReadout::Modulo(double x, double y)
 {
@@ -20,9 +28,29 @@ void TReadout::Setdimension(int xmin ,int xmax,int ymin,int ymax)
   //(1->160,1->138)cluster verticali//
 {
   JMin=xmin;
-  JMax=xmax;//160
+  JMax=xmax;//352
   IMin=ymin;
-  IMax=ymax;//138 
+  IMax=ymax;//300
+}
+
+// routine similar to PositiontoMatrix, but with a different conversion alg
+std::pair<int,int>  TReadout::Position2Xpol(double Xa, double Ya)
+{ 
+  // I is the col index from 1 to 300; J is the raw index from 1 to 352
+
+  // First transform Xa,Ya (MC coord system) in Xpol coordi system, with
+  // (X=0, Y=0) corresponding to pixel id (0,0)
+  // Now assuming that MC coord system follows Pixy coord system
+  // Xa,Ya in cm
+  Xxpol = Ya*10000 +0.5*Pitch +0.5*(IMax -3./2)*Pitch; // um
+  Yxpol = Xa*10000 +0.5*(JMax -1)*Pitch_r; // um
+
+  OffsetCoord o = location_to_offset(Xxpol, Yxpol, Size);
+  //cout << "OffsetCoord for ("<<Xxpol <<","<< Yxpol<<") col " <<
+  //  o.col<<" row " << o.row << endl; 
+  std::pair<int,int> a = make_pair(o.col,o.row);
+  return a;
+
 }
 
 //I riga contata dal basso, dipende dalla posizione Y,J colonna contata da sinistra, dipende dalla X, X e Y in cm 

@@ -14,8 +14,9 @@ TDetector::TDetector(TGasMixture *MIXTURE, TRandom *RND, Bool_t VERBOSE,TDimensi
   NoiseRMS =  2.0;
   Pedestal = 1400;
   ElectronsPerADC = Dimension->GetElectronsADC();///60
-  
+
   Gem    =    new TGem(rng,Dimension);
+
 }
 
 
@@ -42,13 +43,17 @@ std::vector<ADC>   TDetector::mySampling(std::vector<std::pair<double,double> > 
   std::vector<std::pair<double,double> >::iterator pos;
   for (pos=XYSec.begin();pos !=XYSec.end(); ++pos )
     {
-      a  = Readout.PositiontoMatrix((*pos).first,(*pos).second);
+      //a  = Readout.PositiontoMatrix((*pos).first,(*pos).second);
+      a  = Readout.Position2Xpol((*pos).first,(*pos).second);
       //std::cout<<"x = "<<(*pos).first<<" Y= "<<(*pos).second<<std::endl;
       //std::cout<<"I = "<<a.first<<" J= "<<a.second<<std::endl;
       Readout.ChannelfromIJ(a.first,a.second);
       int c=Readout.GetChannel();
       chvector.push_back(c);
       chlist.push_back(c);
+      //if ((c==52050) || (c==52350) || (c==52650)){
+      //std::cout<<"c= " << c <<" x= "<<(*pos).first<<" y= "<<(*pos).second <<" I= "<<a.first<<" J= "<<a.second<<std::endl;
+      //}
     }
   
   chlist.sort();
