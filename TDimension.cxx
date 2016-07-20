@@ -2,8 +2,8 @@
 
 TDimension::TDimension(TString DimensionFile) 
 {
-  Z_Drift     = 1.6; // cm
-  Z_Gem       = 0.6;  //cm
+  Z_Drift     = 1.06; // cm
+  Z_Gem       = 0.06;  //cm
   Z_ReadOut   = 0.0;  //cm 
   Gem_Radius  = 1.0; 
   Gem_Pitch   = 50.; //mu

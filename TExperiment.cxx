@@ -152,6 +152,7 @@ void TExperiment::EventsTree(int Number, TString File)
   int Clusterdim;
   int k;
   int ACheck;
+  Int_t NPrimaryElectrons;
   //Variabili IMAGING
   double XI=0;
   double YI=0;
@@ -176,6 +177,7 @@ void TExperiment::EventsTree(int Number, TString File)
   tree->Branch("XInitial",&XI ,"XI/D");
   tree->Branch("YInitial",&YI ,"YI/D");
   tree->Branch("ZInitial",&ZI ,"ZI/D");
+  tree->Branch("NPrimaryElectrons",&NPrimaryElectrons ,"NPrimaryElectrons/I");
   //
   int nbin = 1000;
   double xmin = 0;
@@ -251,7 +253,7 @@ void TExperiment::EventsTree(int Number, TString File)
       double Zconversion= 0.0;
       k=0;
       
-      while (ConversionPoint.Z()<0.6)  // 0.6 is the transfer gap (between GEM and ASIC)
+      while (ConversionPoint.Z()<0.06)  // 0.6 is the transfer gap (between GEM and ASIC)
 	{ 
 	  Zconversion = Dimension->GetZ_Drift() - rnd->Exp(Lambda);
 	  ConversionPoint.SetXYZ(XI,YI,Zconversion);
@@ -278,6 +280,9 @@ void TExperiment::EventsTree(int Number, TString File)
       AugerEnergy = Track.GetAugerEnergy();
       PhotoelectronTrueRange = Track.GetPhotoelectronTrueRange();
       AugerTrueRange = Track.GetAugerTrueRange();
+
+
+      NPrimaryElectrons = Track.GetNPrimaryElectrons();
 
       if(Track.nphe)nphel++;
       if(Track.naug)nauger++;
