@@ -27,6 +27,7 @@ class TTrack{
   void                         PlotPrimaryIonization();
   void                         Drift();
   void                         PropagatePhotoelectron(); 
+  void                         SetPrimaryIonizationV(std::vector<TXYZ> IonV); 
  
   inline double                GetPhotoelectronPhi() {return PhotoelectronPhi; }
   inline double                GetPhotoelectronTheta() {return PhotoelectronTheta; }

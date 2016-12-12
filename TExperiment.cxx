@@ -130,7 +130,210 @@ TString  TExperiment::GetMixType()
   sprintf(Dummy,"cm %.1fatm",Mixture->GetPressure());Name+=Dummy;
   return Name;
 }
- 
+
+//*******************************************************************************
+/// \brief Loop over G4 generated hit and extract readout hit                   *
+//*******************************************************************************
+void TExperiment::G4MCEventsLoop(int Number, TString File)
+{/* This fuction emulates the EventsTree function 
+    except for the photoelectron propagation.
+    A lot of stuff is duplicated and hard coded, need to cleanup!!!
+ */
+
+  
+  // Input Geant4 root file and get the list of hit and energy
+  TFile *G4File = new TFile(File);
+  TTree *G4Tree = (TTree*) G4File->Get("Events");
+  int G4Entries = G4Tree->GetEntries() ;
+  cout << "G4Entries " << G4Entries  << endl;
+  Int_t G4EventID, G4DU;
+  Double_t G4X_Hit, G4Y_Hit, G4Z_Hit, G4Energy;
+  G4Tree->SetBranchAddress("EventID", &G4EventID);
+  G4Tree->SetBranchAddress("DetUnitID", &G4DU);
+  G4Tree->SetBranchAddress("X_Hit", &G4X_Hit);
+  G4Tree->SetBranchAddress("Y_Hit", &G4Y_Hit);
+  G4Tree->SetBranchAddress("Z_Hit", &G4Z_Hit);
+  G4Tree->SetBranchAddress("EnergyDeposit", &G4Energy);
+  
+  // Output root file setup
+  int MID = MixID;
+  TTree *tree=new TTree("EventsTree","dat");
+  int  Channel[1500];
+  int  Charge[1500];
+  int  DigiCharge[1500];
+  double Phi;
+  double Theta;
+  double PhotoelectronPracticalRange, PhotoelectronEnergy, AugerPracticalRange, AugerEnergy;
+  double PhotoelectronTrueRange, AugerTrueRange;
+  double XI, YI, ZI;
+  int Nevent, Clusterdim, ACheck, k;
+  Int_t NPrimaryElectrons;
+  Int_t DU, EvtId;
+  tree->Branch("Auger",&ACheck,"ACheck/I");///////
+  tree->Branch("Nevent",&Nevent,"Nevent/I");
+  tree->Branch("Clusterdim",&Clusterdim,"Clusterdim/I");
+  tree->Branch("Channel",Channel,"Channel[Clusterdim]/I");
+  tree->Branch("Charge",Charge,"Charge[Clusterdim]/I");
+  tree->Branch("DigiCharge",DigiCharge,"DigiCharge[Clusterdim]/I");
+  tree->Branch("InitialPhi",&Phi,"Phi/D");
+  tree->Branch("InitialTheta",&Theta,"Theta/D");
+  tree->Branch("PhotoelPracticalRange",&PhotoelectronPracticalRange,"PhotoelectronPracticalRange/D");
+  tree->Branch("PhotoelTrueRange",&PhotoelectronTrueRange,"PhotoelectronTrueRange/D");
+  tree->Branch("PhotoelectronEnergy",&PhotoelectronEnergy,"PhotoelectronEnergy/D");
+  tree->Branch("AugerPracticalRange",&AugerPracticalRange,"AugerPracticalRange/D");
+  tree->Branch("AugerTrueRange",&AugerTrueRange,"AugerTrueRange/D");
+  tree->Branch("AugerEnergy",&AugerEnergy,"AugerEnergy/D");
+  tree->Branch("MixID",&MID ,"MixID/I");
+  tree->Branch("Energy",&PhotonEnergy ,"PhotonEnergy/D");
+  tree->Branch("Undetected",&k ,"k/I");
+  tree->Branch("XInitial",&XI ,"XI/D");
+  tree->Branch("YInitial",&YI ,"YI/D");
+  tree->Branch("ZInitial",&ZI ,"ZI/D");
+  tree->Branch("NPrimaryElectrons",&NPrimaryElectrons ,"NPrimaryElectrons/I");
+  tree->Branch("DU",&DU ,"DU/I");
+  tree->Branch("EvtId",&EvtId ,"EvtId/I");
+  
+  // Need a fake source and photon
+  Source = new TSource(1, 0, 0, rnd, 0);
+  TXYZ ConversionPoint(0.,0.,0.);
+  TPhoton Photon(Source, ConversionPoint, rnd, 0);
+  
+  // Need detector
+  TGem Gem(rnd,Dimension);
+  TDetector myDetector(Mixture,rnd,0,Dimension);
+  TReadout Readout(Dimension);
+  ADC Signal;
+  
+  // Init vars and start loop
+  std::vector<TXYZ> G4PrimaryIonizationV;
+  Int_t G4CurrentEvtId = -1;
+  Int_t G4NumProcessedEvt = 0;
+  int small_size = 0;
+  for (int i=0; i<G4Entries; i++)
+    {
+      G4Tree->GetEntry(i);
+      
+      if (G4EventID != G4CurrentEvtId) // new event: process previous one and reset variables
+	{
+	  // if not the first ID, process the event
+	  if (G4CurrentEvtId !=-1)
+	    {
+	      if (G4NumProcessedEvt%10 ==0) {
+		cout << "G4MC:: Processing " << G4NumProcessedEvt << " evts. Last Id: " << G4CurrentEvtId << endl;}
+	      //cout << "G4MC:: Processing event id " << G4CurrentEvtId << " (" << G4NumProcessedEvt << " evt)" << endl;
+	      G4NumProcessedEvt ++;
+	      // DO THE PROCESSING HERE!!!!!
+	      DU = G4DU;
+	      TTrack Track(&Photon, Mixture, rnd, 0);
+	      Track.SetDimension (Dimension->GetGem_Radius()/2 ,
+				  Dimension->GetGem_Radius()/2,
+				  Dimension->GetZ_Drift(),
+				  Dimension->GetZ_Gem() );
+	      Track.SetPrimaryIonizationV(G4PrimaryIonizationV); //
+	      Track.Drift();
+	      std::vector<std::pair<double,double> >  DifEl=Track.GetDiffElectronPosition();      
+	      std::vector<ADC> Digi= myDetector.mySampling(Gem.DiffusionofSecondaryElectrons(DifEl), Readout);
+	      //cout << "G4MC:: CS DIGI SIZE: " << Digi.size() << " DU " << DU <<endl;
+	      
+	      if(Digi.size()>0)
+		{
+		  EvtId = G4CurrentEvtId;
+		  Clusterdim=Digi.size(); 
+		  std::vector<ADC>::iterator pos;
+		  int i =0;
+		  for (pos=Digi.begin(); pos!=Digi.end(); ++pos)
+		    {
+		      Signal=(*pos);//Digi[i];
+		      if (Signal.Channel>0) // valid channel
+			{
+			  Channel[i]=Signal.Channel;
+			  //cout << "CS Signal.Channel: " << Signal.Channel << endl;
+			  Charge[i]=Signal.Charge;
+			  DigiCharge[i++]=Signal.DigiCharge;
+			}
+		    }
+		  tree->Fill();
+		}
+	      else small_size++;
+	      
+	    }
+
+	  // check if reached the maximum number of events:
+	  //cout << " processed evt " << G4NumProcessedEvt << " evt" << endl;
+	  if (G4NumProcessedEvt==Number) {break;}
+
+	  // move to next one...
+	  //cout << "G4MC:: New Event found, id= " << G4EventID << endl;
+	  G4CurrentEvtId = G4EventID;
+	  
+	  // reset ionization vector:
+	  G4PrimaryIonizationV.clear();
+
+	  
+	}
+      else // fill event hit list
+	{
+	  //cout << "Id " <<i <<  " G4EventID " << G4EventID << " G4 Hit (X,Y,Z,E) ";
+	  //cout << G4X_Hit <<" " << G4Y_Hit <<" " << G4Z_Hit << " " << G4Energy << endl;
+
+	  //
+	  // conversion from G4 geom to MC
+	  //
+	  
+	  /* //First version:
+	  double Z_MC = G4Z_Hit+174.534+0.5+0.06; // center in Gas cell @ -174.534, add half thickness, add transfer gap; all in cm
+	  double X_MC = -99.;
+	  double Y_MC = -99.;
+	  if (G4DU == 0) //, for DU 0:
+	    {
+	      X_MC = G4X_Hit; // this is the same, in cm
+	      Y_MC = G4Y_Hit-28.; // center in Gas cell @ +28; all in cm
+	    }
+	  if (G4DU == 1)//, for DU 1: rotating -120 deg puts du1 in the position of du 0
+	    {
+	      X_MC = (-0.5*G4X_Hit + (sqrt(3)/2)*G4Y_Hit); 
+	      Y_MC = ((-sqrt(3)/2)*G4X_Hit -0.5*G4Y_Hit)-28.; 
+	    }
+	  if (G4DU == 2)//, for DU 1: rotating 120 deg puts du2 in the position of du 0
+	    {
+	      X_MC = (-0.5*G4X_Hit + (-sqrt(3)/2)*G4Y_Hit); 
+	      Y_MC = ((sqrt(3)/2)*G4X_Hit -0.5*G4Y_Hit)-28.; 
+	    }
+	  */
+
+	  // Second version, coordinate il local (Gas Cell) coordinate
+	  double Z_MC = G4Z_Hit+0.5+0.06; // add half thickness, add transfer gap; all in cm
+	  double X_MC = G4X_Hit; // already centered in 0
+	  double Y_MC = G4Y_Hit;
+	  
+	  double E_MC = G4Energy; // assume Energy is in keV (as needed in the MC)
+	  // Get number of electron/ion pair in this step: pure poisson fluctuations
+	  int nAvePairs = 1000*E_MC/Mixture->GetWIonization();
+	  int nPairs    = rnd->Poisson(nAvePairs);
+	  // fill the ionization vector
+	  for (Int_t i=0; i<nPairs; i++){
+	    if (std::fabs(X_MC)<0.8 && std::fabs(Y_MC)<0.8) // include only hit close to the active region (which is 15x15 mm)
+	      {
+		TXYZ IonizationPoint = TXYZ(X_MC, Y_MC, Z_MC);
+		G4PrimaryIonizationV.push_back(IonizationPoint);
+	      }
+	  }
+	  
+	  //cout << " IN MC GEOMETRY: (X,Y,Z,E) ";
+	  //cout << X_MC <<" " << Y_MC <<" " << Z_MC << " " << E_MC << " NPairs " << nPairs
+	  //     << " V.size " << G4PrimaryIonizationV.size() << endl; 
+	}
+    } // end of evt loop
+  cout << "G4MC::  Discarded events with 0 pixels: " << small_size << endl;
+
+  TString F = File;
+  F.ReplaceAll(".root","_GPDMC.root");
+  TFile FileT(F,"RECREATE");
+  tree->Write();
+  FileT.Close();
+  delete tree;
+
+}
 
 void TExperiment::EventsTree(int Number, TString File)
 {
@@ -248,7 +451,8 @@ void TExperiment::EventsTree(int Number, TString File)
       std::pair<double,double> XYConversion =  Source->GetConversionXY();
       XI = XYConversion.first;
       YI = XYConversion.second;
-      TXYZ ConversionPoint(XI,YI,0.0);  
+      TXYZ ConversionPoint(XI,YI,0.0);
+      
       double Lambda=1./(Mixture->GetPhotoelectricCrossSection(PhotonEnergy)*(Mixture->GetDensity()));
       double Zconversion= 0.0;
       k=0;
@@ -298,7 +502,9 @@ void TExperiment::EventsTree(int Number, TString File)
       Track.Drift();
       std::vector<std::pair<double,double> >  DifEl=Track.GetDiffElectronPosition();      
       std::vector<ADC> Digi= myDetector.mySampling(Gem.DiffusionofSecondaryElectrons(DifEl), Readout);
-      if(Digi.size()>10)
+      //if(Digi.size()>10) // CS why event with less than 10 pixels are discarded?
+      //cout << "CS DIGI SIZE: " << Digi.size() << endl;
+      if(Digi.size()>1)
 	{
 	  Clusterdim=Digi.size(); 
 	  std::vector<ADC>::iterator pos;

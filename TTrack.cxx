@@ -516,6 +516,12 @@ void TTrack::PlotPrimaryIonization()
 	}
 	}  */
 
+
+void TTrack::SetPrimaryIonizationV(std::vector<TXYZ> IonV)
+{
+  PrimaryIonizationV = IonV;
+}
+
 void TTrack::Drift()
 {
   double DiffusionSigma = Mixture->GetDiffusionSigma();

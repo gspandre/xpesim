@@ -7,19 +7,23 @@
 gas_id:12
 
 # gas pressure (atm)
-pressure: 1.
+pressure:1.
 
 # cell thickness (cm)
-thickness: 1
+thickness:1
 
-#
-num_evts: 100
-
-energy_min: 5.2
-energy_max: 5.9
+# energy, only energy_min used right now
+energy_min:11.0
+energy_max:11.0
 
 # polarization angle and degree
-pol_angle: 30.
-pol_degree: 1.
+pol_angle:30.
+pol_degree:1.
 
 # source + window non selectable for now
+
+# number of event to be simulated or read from file (-1 for all)
+num_evts:-1
+
+# input file path : 'None' to run a standard MC 
+input_file:/data/xpe/work/G4_2_xpol/test_v1/primaryProtons_tmp.root
