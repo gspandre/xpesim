@@ -157,6 +157,11 @@ void TExperiment::G4MCEventsLoop(int Number, TString File)
   
   // Output root file setup
   int MID = MixID;
+
+  TString F = File;
+  F.ReplaceAll(".root","_GPDMC.root");
+  TFile FileT(F,"RECREATE");
+  
   TTree *tree=new TTree("EventsTree","dat");
   int  Channel[1500];
   int  Charge[1500];
@@ -326,12 +331,10 @@ void TExperiment::G4MCEventsLoop(int Number, TString File)
     } // end of evt loop
   cout << "G4MC::  Discarded events with 0 pixels: " << small_size << endl;
 
-  TString F = File;
-  F.ReplaceAll(".root","_GPDMC.root");
-  TFile FileT(F,"RECREATE");
+  
   tree->Write();
   FileT.Close();
-  delete tree;
+  //delete tree;
 
 }
 
