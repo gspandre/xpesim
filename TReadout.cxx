@@ -58,8 +58,8 @@ std::pair<int,int>  TReadout::Position2Xpol(double Xa, double Ya)
     }
   else 
     {
-      std::cout <<"ATTENZIONE coordinate fuori dal detector!!!  "<< 
-	" X= "<< Xa << " Y= "<< Ya <<" I ="<<o.col<<" J = "<<o.row<<std::endl;
+      //std::cout <<"ATTENZIONE coordinate fuori dal detector!!!  "<< 
+      //" X= "<< Xa << " Y= "<< Ya <<" I ="<<o.col<<" J = "<<o.row<<std::endl;
       std::pair<int,int> a = make_pair(-9999,-9999); //A non-existing pixel
       return  a;
     }

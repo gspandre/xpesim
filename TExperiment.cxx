@@ -134,7 +134,7 @@ TString  TExperiment::GetMixType()
 //*******************************************************************************
 /// \brief Loop over G4 generated hit and extract readout hit                   *
 //*******************************************************************************
-void TExperiment::G4MCEventsLoop(int Number, TString File)
+void TExperiment::G4MCEventsLoop(int FirstEvt, int Number, TString File)
 {/* This fuction emulates the EventsTree function 
     except for the photoelectron propagation.
     A lot of stuff is duplicated and hard coded, need to cleanup!!!
@@ -163,9 +163,9 @@ void TExperiment::G4MCEventsLoop(int Number, TString File)
   TFile FileT(F,"RECREATE");
   
   TTree *tree=new TTree("EventsTree","dat");
-  int  Channel[1500];
-  int  Charge[1500];
-  int  DigiCharge[1500];
+  int  Channel[5000];
+  int  Charge[5000];
+  int  DigiCharge[5000];
   double Phi;
   double Theta;
   double PhotoelectronPracticalRange, PhotoelectronEnergy, AugerPracticalRange, AugerEnergy;
@@ -208,7 +208,9 @@ void TExperiment::G4MCEventsLoop(int Number, TString File)
   TDetector myDetector(Mixture,rnd,0,Dimension);
   TReadout Readout(Dimension);
   ADC Signal;
-  
+
+  cout << "G4MC:: FirstEvt set to " << FirstEvt << endl;
+    
   // Init vars and start loop
   std::vector<TXYZ> G4PrimaryIonizationV;
   Int_t G4CurrentEvtId = -1;
@@ -227,45 +229,50 @@ void TExperiment::G4MCEventsLoop(int Number, TString File)
 		cout << "G4MC:: Processing " << G4NumProcessedEvt << " evts. Last Id: " << G4CurrentEvtId << endl;}
 	      //cout << "G4MC:: Processing event id " << G4CurrentEvtId << " (" << G4NumProcessedEvt << " evt)" << endl;
 	      G4NumProcessedEvt ++;
-	      // DO THE PROCESSING HERE!!!!!
-	      DU = G4DU;
-	      TTrack Track(&Photon, Mixture, rnd, 0);
-	      Track.SetDimension (Dimension->GetGem_Radius()/2 ,
-				  Dimension->GetGem_Radius()/2,
-				  Dimension->GetZ_Drift(),
-				  Dimension->GetZ_Gem() );
-	      Track.SetPrimaryIonizationV(G4PrimaryIonizationV); //
-	      Track.Drift();
-	      std::vector<std::pair<double,double> >  DifEl=Track.GetDiffElectronPosition();      
-	      std::vector<ADC> Digi= myDetector.mySampling(Gem.DiffusionofSecondaryElectrons(DifEl), Readout);
-	      //cout << "G4MC:: CS DIGI SIZE: " << Digi.size() << " DU " << DU <<endl;
+	      // check first event id
+	      if (G4NumProcessedEvt>FirstEvt){
+		
+		// DO THE PROCESSING HERE!!!!!
+		DU = G4DU;
+		TTrack Track(&Photon, Mixture, rnd, 0);
+		Track.SetDimension (Dimension->GetGem_Radius()/2 ,
+				    Dimension->GetGem_Radius()/2,
+				    Dimension->GetZ_Drift(),
+				    Dimension->GetZ_Gem() );
+		Track.SetPrimaryIonizationV(G4PrimaryIonizationV); //
+		Track.Drift();
+		std::vector<std::pair<double,double> >  DifEl=Track.GetDiffElectronPosition();      
+		std::vector<ADC> Digi= myDetector.mySampling(Gem.DiffusionofSecondaryElectrons(DifEl), Readout);
+		//cout << "G4MC:: CS DIGI SIZE: " << Digi.size() << " DU " << DU <<endl;
+		if(Digi.size()>5000){cout << "G4MC:: CS DIGI SIZE: " << Digi.size() << endl; }
+		
+		if(Digi.size()>0)
+		  {
+		    EvtId = G4CurrentEvtId;
+		    Clusterdim=Digi.size();
+		    std::vector<ADC>::iterator pos;
+		    int i =0;
+		    for (pos=Digi.begin(); pos!=Digi.end(); ++pos)
+		      {
+			Signal=(*pos);//Digi[i];
+			if (Signal.Channel>0) // valid channel
+			  {
+			    Channel[i]=Signal.Channel;
+			    //cout << "CS Signal.Channel: " << Signal.Channel << endl;
+			    Charge[i]=Signal.Charge;
+			    DigiCharge[i++]=Signal.DigiCharge;
+			  }
+		      }
+		    tree->Fill();
+		  }
+		else small_size++;
 	      
-	      if(Digi.size()>0)
-		{
-		  EvtId = G4CurrentEvtId;
-		  Clusterdim=Digi.size(); 
-		  std::vector<ADC>::iterator pos;
-		  int i =0;
-		  for (pos=Digi.begin(); pos!=Digi.end(); ++pos)
-		    {
-		      Signal=(*pos);//Digi[i];
-		      if (Signal.Channel>0) // valid channel
-			{
-			  Channel[i]=Signal.Channel;
-			  //cout << "CS Signal.Channel: " << Signal.Channel << endl;
-			  Charge[i]=Signal.Charge;
-			  DigiCharge[i++]=Signal.DigiCharge;
-			}
-		    }
-		  tree->Fill();
-		}
-	      else small_size++;
-	      
+	      }
 	    }
 
 	  // check if reached the maximum number of events:
 	  //cout << " processed evt " << G4NumProcessedEvt << " evt" << endl;
-	  if (G4NumProcessedEvt==Number) {break;}
+	  if (G4NumProcessedEvt==(Number+FirstEvt)) {break;}
 
 	  // move to next one...
 	  //cout << "G4MC:: New Event found, id= " << G4EventID << endl;
@@ -342,9 +349,9 @@ void TExperiment::EventsTree(int Number, TString File)
 {
   bool MixEffON = false;
   TTree *tree=new TTree("EventsTree","dat");
-  int  Channel[1500];
-  int  Charge[1500];
-  int  DigiCharge[1500];
+  int  Channel[2000];
+  int  Charge[2000];
+  int  DigiCharge[2000];
   double Phi;
   double Theta;
   double PhotoelectronPracticalRange, PhotoelectronEnergy, AugerPracticalRange, AugerEnergy;

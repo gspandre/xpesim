@@ -27,7 +27,7 @@ class TExperiment
   TString  GetNameforFile();
   TString  GetMixType();
   void     EventsTree(int Number=1000, TString File= "Eventstree");
-  void     G4MCEventsLoop(int Number, TString File);
+  void     G4MCEventsLoop(int FirstEvt, int Number, TString File);
   void     AnalyzeTree();
   void     ReadResult(double &mucut,double &Eff,double &Effcut,double &mu,double &FitProbability, double  &FitProbabilityCut,double &mufirst);
   double   GetEfficiencyMixture(double myene=0);

@@ -13,8 +13,8 @@ pressure:1.
 thickness:1
 
 # energy, only energy_min used right now
-energy_min:11.0
-energy_max:11.0
+energy_min:5.9
+energy_max:5.9
 
 # polarization angle and degree
 pol_angle:30.
@@ -25,5 +25,14 @@ pol_degree:1.
 # number of event to be simulated or read from file (-1 for all)
 num_evts:-1
 
+# first event to be read from file (starting from 0)
+first_evt:0
+
 # input file path : 'None' to run a standard MC 
-input_file:/data/xpe/work/G4_2_xpol/test_v1/primaryProtons_tmp.root
+#input_file:/data/xpe/work/G4_2_xpol/test_v1/primaryProtons_tmp.root
+#input_file:/data/xpe/work/G4_2_xpol/test_v2/2769_polarized_3.7keV.root
+#input_file:/data/xpe/work/G4_2_xpol/test_v3_Bkg_G4Sim/secondaryProtons.root
+# evt 113528 offending -- Total Event Found 347908
+input_file:/data/xpe/work/G4_2_xpol/test_v3_Bkg_G4Sim/primaryAlpha.root
+
+#input_file:None

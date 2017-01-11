@@ -40,10 +40,12 @@ int main(int argn, char *argv[])
   s_mapStringValues["pol_angle"] = 7;
   s_mapStringValues["pol_degree"] = 8;
   s_mapStringValues["input_file"] = 9;
+  s_mapStringValues["first_evt"] = 10;
   int gas_id = -1;
   double pressure = -1.;
   double thickness = -1.;
   int num_evts = -1;
+  int first_evt = 0;
   double energy_min = -1.;
   double energy_max = -1.;
   double pol_angle = -1.;
@@ -99,6 +101,10 @@ int main(int argn, char *argv[])
 	      file_path = sValue;
 	      std::cout <<"2 file_path set to "<< file_path <<std::endl;
 	      break;
+	    case 10:
+	      first_evt = atoi( sValue.c_str());
+	      std::cout <<"first_evt set to "<< first_evt <<std::endl;
+	      break;
 	    default:
 	      std::cout << "value of "<< sKeyWord <<" unknown"<<std::endl;
 	    }
@@ -129,7 +135,7 @@ int main(int argn, char *argv[])
   else{
     std::cout <<"Input file set to "<< file_path << std::endl;
     std::cout <<"Processing "<< num_evts<< " events." << std::endl;
-    Experiment->G4MCEventsLoop(num_evts, file_path);
+    Experiment->G4MCEventsLoop(first_evt, num_evts, file_path);
     
   // v0: 108 in du=0; 86 in du=1; 89 in du=2
   //Experiment->G4MCEventsLoop(-1, "/data/xpe/work/G4_2_xpol/CXB.root");
