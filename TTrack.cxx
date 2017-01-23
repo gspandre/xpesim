@@ -17,7 +17,7 @@ TTrack::TTrack(TPhoton *PHOTON, TGasMixture *MIXTURE, TRandom *RND, Bool_t VERBO
 
   DistanceFromStart    = 0.0;
   MaxDistanceFromStart = 0.0;
-  PhotoelectronPhi = 0.0; 
+  PhotoelectronPhi = 0.0;
   PhotoelectronTheta = 0.0;
  }
 
@@ -29,9 +29,9 @@ void TTrack::SetDimension(Double_t a,Double_t b,Double_t c,Double_t d)
   zmin=d;
 }
 
-//propagate the photoelectron  
+//propagate the photoelectron
 void TTrack::PropagatePhotoelectron()
-{ 
+{
   nphe = 0;
   naug = 0;
   nPhotoelectronElasticScatterings = 0;
@@ -46,7 +46,7 @@ void TTrack::PropagatePhotoelectron()
   //if( Elementino == "H")std::cout<<" eccoci "<<Elementino<<std::endl;
   
 
-  if(ResidualEnergy<=0) 
+  if(ResidualEnergy<=0)
     std::cout<<"Attention!!! ====>>>>> ResidualEnergy = "<<ResidualEnergy<<std::endl;
 
   ConversionPoint =  Photon->GetConversionPoint();
@@ -69,10 +69,10 @@ void TTrack::PropagatePhotoelectron()
   //count of number of phelectrons
   if (ResidualEnergy > MIN_ANALYTIC_CROSS_SECTIONS_ENERGY) nphe++;
   
-  while (ResidualEnergy > MIN_ANALYTIC_CROSS_SECTIONS_ENERGY && 
-	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].X()<xdim && 
+  while (ResidualEnergy > MIN_ANALYTIC_CROSS_SECTIONS_ENERGY &&
+	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].X()<xdim &&
 	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].X()>-xdim &&
-	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()<ydim && 
+	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()<ydim &&
 	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()>-ydim &&
 	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Z()<zdim &&
 	 PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Z()>zmin)
@@ -113,7 +113,7 @@ void TTrack::PropagatePhotoelectron()
     std::cout << "Number of collisions: " << nPhotoelectronElasticScatterings << std::endl;
     std::cout << "True range:           " << PhotoelectronTrueRange << " cm" << std::endl;
     std::cout << "Pratical range:       " << PhotoelectronPraticalRange << " cm" << std::endl;
-    std::cout << "Start-to-end range:   " << PhotoelectronStartToEndRange << " cm" << std::endl; 
+    std::cout << "Start-to-end range:   " << PhotoelectronStartToEndRange << " cm" << std::endl;
     }
   
   // Propagate the Auger electron (if any).
@@ -149,17 +149,17 @@ void TTrack::PropagatePhotoelectron()
 	   /*ResidualEnergy > MIN_ANALYTIC_CROSS_SECTIONS_ENERGY &&
 	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].X()<xdim && //??Why Photoelectron vertex? (Gloria)
 	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].X()>-xdim &&
-	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()<ydim && 
+	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()<ydim &&
 	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Y()>-ydim &&
 	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Z()<zdim &&
 	   PhotoelectronScatteringV[nPhotoelectronElasticScatterings].Z()>zmin)
 	   */
 	   ResidualEnergy > MIN_ANALYTIC_CROSS_SECTIONS_ENERGY &&  //changed by Gloria (Sept. 2012) for coherence with the Photoelecron case
-	   AugerScatteringV[nAugerElasticScatterings].X()<xdim && 
+	   AugerScatteringV[nAugerElasticScatterings].X()<xdim &&
 	   AugerScatteringV[nAugerElasticScatterings].X()>-xdim &&
-	   AugerScatteringV[nAugerElasticScatterings].Y()<ydim && 
+	   AugerScatteringV[nAugerElasticScatterings].Y()<ydim &&
 	   AugerScatteringV[nAugerElasticScatterings].Y()>-ydim &&
-	   AugerScatteringV[nAugerElasticScatterings].Z()<zdim &&	   
+	   AugerScatteringV[nAugerElasticScatterings].Z()<zdim &&
 	   AugerScatteringV[nAugerElasticScatterings].Z()>zmin)
       {
 	
@@ -177,12 +177,12 @@ void TTrack::PropagatePhotoelectron()
 	}
       }
     // Last electrons are created in the coordinates of the last collision.
-    if(ResidualEnergy <= MIN_ANALYTIC_CROSS_SECTIONS_ENERGY && PrimaryIonizationV.size()>0)   
-      { 
+    if(ResidualEnergy <= MIN_ANALYTIC_CROSS_SECTIONS_ENERGY && PrimaryIonizationV.size()>0)
+      {
 	Int_t ResidualAugerPairs = GetnPairs(ResidualEnergy);
 	for (Int_t i=0; i<ResidualAugerPairs; i++)
 	  {
-	    PrimaryIonizationV.push_back(PrimaryIonizationV[nPrimaryElectrons-1]);   
+	    PrimaryIonizationV.push_back(PrimaryIonizationV[nPrimaryElectrons-1]);
 	  }
 	nPrimaryElectrons += ResidualAugerPairs;
       }
@@ -193,7 +193,7 @@ void TTrack::PropagatePhotoelectron()
       std::cout << "Number of collisions: " << nAugerElasticScatterings << std::endl;
       std::cout << "True range:           " << AugerTrueRange << " cm" << std::endl;
       std::cout << "Pratical range:       " << AugerPraticalRange << " cm" << std::endl;
-      std::cout << "Start-to-end range:   " << AugerStartToEndRange << " cm" << std::endl; 
+      std::cout << "Start-to-end range:   " << AugerStartToEndRange << " cm" << std::endl;
     }
   }
 
@@ -210,7 +210,7 @@ void TTrack::PropagatePhotoelectron()
 /// \brief Evaluate the coordinates of the next step in photoelectron path.     *
 /// The formula are taken from Joy's book - note that there is an error in the  *
 /// book: V1=AM*sin(Phi) -> V1=AN*sin(Phi).                                     *
-/// The routine also takes care of generating the primary ionization.            * 
+/// The routine also takes care of generating the primary ionization.            *
 //*******************************************************************************
 void TTrack::EvaluateNextStep(TString MODE)
 {
@@ -233,11 +233,10 @@ void TTrack::EvaluateNextStep(TString MODE)
     }
   }
   Double_t Path =rnd->Exp(Mixture->GetElasticMeanFreePath(ResidualEnergy, "MOTT"));
-  
+  //Double_t Path = Mixture->GetElasticMeanFreePath(ResidualEnergy, "MOTT");
   
   Double_t Phi  =
-    Mixture->GetScatteringElement(ResidualEnergy, "MOTT")->GetScatteringAngle(ResidualEnergy, "MOTT");
-  
+  Mixture->GetScatteringElement(ResidualEnergy, "MOTT")->GetScatteringAngle(ResidualEnergy, "MOTT");
   
   Double_t Psi  = rnd->Uniform(0, 2*kPI);
   Double_t V1,V2;
@@ -261,7 +260,7 @@ void TTrack::EvaluateNextStep(TString MODE)
   CX = CA;
   CY = CB;
   CZ = CC;
-  Double_t EnergyLoss = Path*Mixture->GetStoppingPower(ResidualEnergy); 
+  Double_t EnergyLoss = Path*Mixture->GetStoppingPower(ResidualEnergy);
   ResidualEnergy -= EnergyLoss;
     
   if (MODE == "PHOTOELECTRON")
@@ -318,13 +317,22 @@ Int_t TTrack::GetnPairs(Double_t ENERGY_LOSS)
   //return (Int_t)(0.54 + rnd->Exp(1000*ENERGY_LOSS/Mixture->GetWIonization()));
   // new version Compound Poisson distribution
   Double_t MeanNumberSecondary =  1000.*ENERGY_LOSS/(Mixture->GetWIonization());
-  Int_t NumberPrimary = rnd->Poisson(MeanNumberSecondary/3.);
-  Int_t NumberSecondary = 0;
-  for (int i=0; i<NumberPrimary; i++)
-    {
-      NumberSecondary +=rnd->Poisson(3.);
-    }
-  return NumberSecondary;
+  Double_t FanoInv = (1./0.3);
+  Double_t NumberPrimary = (rnd->PoissonD(MeanNumberSecondary*FanoInv))/FanoInv;
+  //Int_t NumberSecondary = rnd->Poisson(MeanNumberSecondary);
+  //std::cout << "Energy loss: " << ENERGY_LOSS << std::endl;
+  //std::cout << "MeanNumberSecondary: " << MeanNumberSecondary << std::endl;
+  //std::cout << "NumberPrimary: " << NumberPrimary << std::endl;
+  //std::cout << '\n';
+  
+  //Int_t NumberPrimary = rnd->Poisson(MeanNumberSecondary/3.);
+  //Int_t NumberSecondary = 0;
+  //for (int i=0; i<NumberPrimary; i++)
+  //  {
+  //    NumberSecondary +=rnd->Poisson(3.);
+  //  }
+  //return NumberSecondary;
+  return (Int_t) (NumberPrimary+0.5);
 }
 
 
@@ -441,7 +449,7 @@ void TTrack::PlotPrimaryIonization()
     /*
       X[i] = PrimaryIonizationX[i]*10000.0;
       Y[i] = PrimaryIonizationY[i]*10000.0;
-      Z[i] = PrimaryIonizationZ[i]*10000.0; 
+      Z[i] = PrimaryIonizationZ[i]*10000.0;
     */
   }
   Double_t Dime = 0.01*(Int_t)(PhotoelectronTrueRange*30*10000);
@@ -496,7 +504,7 @@ void TTrack::PlotPrimaryIonization()
 
 /*void TTrack::Drift(double Z_MIN)
   {
-  double DiffusionSigma = Mixture->GetDiffusionSigma(); //mu/sqrt(cm) 
+  double DiffusionSigma = Mixture->GetDiffusionSigma(); //mu/sqrt(cm)
   //  std::cout<<"DiffusionSigma = "<<DiffusionSigma<<std::endl;
   for(int i = 0; i < nPrimaryElectrons;i++)
   {
@@ -532,7 +540,7 @@ void TTrack::Drift()
       Xelectron=(*pos).X();
       Yelectron=(*pos).Y();
       Zelectron=(*pos).Z();
-      if(Zelectron>zmin) 
+      if(Zelectron>zmin)
       	{
 	  
 	  sigma = DiffusionSigma*sqrt(Zelectron-zmin)/10000;
@@ -543,7 +551,3 @@ void TTrack::Drift()
 	}
     }
 }
-
-
-
-

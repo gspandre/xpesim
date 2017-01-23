@@ -18,7 +18,7 @@ class TGem{
   std::vector<std::pair<double,double> >  DiffusionofSecondaryElectrons(std::vector<std::pair<double,double> > VectorIn ) ;
   inline int GetPac() {return Pac;}
   inline double GetHole() {return Hole;}
- private:  
+ private:
   double Xm;
   double Ym;
   double Gain;
@@ -29,6 +29,7 @@ class TGem{
   double Hole;
   double XStep,YStep;
   double TraslX,TraslY;
+  TF1* GainDistribution;
 };
 
 #endif

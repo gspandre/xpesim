@@ -11,15 +11,19 @@ TGem::TGem(TRandom *RNG,TDimension *Dimension)
   YStep = Pitch*sqrt(3.0);
   TraslX =floor(10000/XStep);
   TraslY =floor(10000/YStep);
+  GainDistribution = new TF1("GainDistribution","pow((x*(1.0+[0])/[1]),[0])*exp(-(x*(1.0+[0])/[1]))", 0., 2000.);
+  GainDistribution->SetParameters(1.0, Gain);
 }
 
 int TGem::GetSecondaryElectrons()
 {
-  return (int) (rng->Exp(Gain));
+  //return (int) (rng->Exp(Gain));
+  //return (int) Gain;
+  return (int) (GainDistribution->GetRandom()+0.5);
 }
 /*
 std::pair<double,double> TGem::Sampling(double x, double y)
-{  
+{
   float  px  = Pitch;
   double py  = px*sqrt(3.)/2.;
   int nx,ny;
@@ -32,11 +36,11 @@ std::pair<double,double> TGem::Sampling(double x, double y)
   cx = nx*px/2.;
   cy = ny*py;
   
-  if((nx+ny)%2==0) 
+  if((nx+ny)%2==0)
     {
       XY = std::make_pair(cx,cy);
     }
-  else 
+  else
     {
       double rx = (x-cx);
       double ry = (y-cy);
@@ -56,7 +60,7 @@ std::pair<double,double> TGem::Sampling(double x, double y)
 		  Xm          = i*px/2.;
 		  Ym          = j*py;
 		  MinimumDist = Dist;
-		} 
+		}
 	    }
 	}
       XY = std::make_pair(cx + Xm,cy + Ym);
@@ -64,15 +68,15 @@ std::pair<double,double> TGem::Sampling(double x, double y)
     }
   
   return XY;
-} 
+}
 */
 
 
 /*creazione elettroni secondari con distribuzione gaussiana campionati espressi
   in cm (posizione xy)*/
 
-std::vector<std::pair<double,double> >  TGem::DiffusionofSecondaryElectrons(std::vector<std::pair<double,double> > VectorIn ) 
-{ 
+std::vector<std::pair<double,double> >  TGem::DiffusionofSecondaryElectrons(std::vector<std::pair<double,double> > VectorIn )
+{
   AvalangeSigma=1./10000.* Pitch/2.5 ;// da /3 a /2 per i dati reali(25/11/05), nessun dato simulato con questa diffusione
 
   std::vector<std::pair<double,double> >   XYSecondary;
@@ -81,7 +85,7 @@ std::vector<std::pair<double,double> >  TGem::DiffusionofSecondaryElectrons(std:
   int NumberPac;
   std::vector<std::pair<double,double> >::iterator pos;
   for (pos=VectorIn.begin();pos !=VectorIn.end(); ++pos )
-    {     
+    {
       x=(*pos).first;
       y=(*pos).second;
       //
@@ -91,12 +95,12 @@ std::vector<std::pair<double,double> >  TGem::DiffusionofSecondaryElectrons(std:
 	//
 	
 	NumberPac = GetSecondaryElectrons()/Pac;//1+( (double)GetSecondaryElectrons()/((double )Pac));
-      //std::cout<<"number secondary electron"<<NumberPac*Pac<<std::endl; 
+      //std::cout<<"number secondary electron"<<NumberPac*Pac<<std::endl;
       for (int i=0; i<NumberPac; i++)
 	{
 	  double xp=x + rng->Gaus(0,AvalangeSigma);
 	  double yp=y + rng->Gaus(0,AvalangeSigma);
-	  std::pair<double,double> xy = std::make_pair( xp, yp);	  
+	  std::pair<double,double> xy = std::make_pair( xp, yp);
 	  XYSecondary.push_back(xy);
 	}
     }
@@ -105,7 +109,7 @@ std::vector<std::pair<double,double> >  TGem::DiffusionofSecondaryElectrons(std:
 }
 
 std::pair<double,double> TGem::GemSampling(double xin, double yin)
-{  
+{
   xin = xin*10000 +  XStep*TraslX;
   yin = yin*10000 +  YStep*TraslY;
   double NumberStepX = floor(xin/XStep) * XStep;
@@ -126,7 +130,7 @@ std::pair<double,double> TGem::GemSampling(double xin, double yin)
   std::set<double>::iterator pos;
   pos = c.begin();
   std::pair<double,double> exit;
-  if (*pos == DistanceI) 
+  if (*pos == DistanceI)
     {
       exit = std::make_pair(NumberStepX,NumberStepY);
     }
